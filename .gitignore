@@ -1,39 +1,38 @@
-# Node modules
+# Ignore Node modules
 node_modules/
 
-# Environment variables
-.env/
+# Ignore environment variables
+.env
 
-# Log files
+# Ignore log files
 logs/
 *.log
 
-# Dependency directories
+# Ignore dependency directories
 pids/
-.DS_Store
 .cache/
 dist/
 node_modules/
 bower_components/
 
-# OS generated files
+# Ignore OS generated files
 .DS_Store
 Thumbs.db
 
-# IDE files
+# Ignore IDE files
 .idea/
 .vscode/
 *.sublime-project
 *.sublime-workspace
 
-# Compiled binary addons (node-gyp)
+# Ignore compiled binary addons (node-gyp)
 /build/
 
-# Optional npm cache directory
+# Ignore optional npm cache directory
 .npm
 
-# Compiled Python files
+# Ignore compiled Python files
 *.pyc
 
-# Mac files
+# Ignore Mac files
 *.DS_Store
