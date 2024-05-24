@@ -2,16 +2,23 @@ const express = require('express');
 const db = require('./config/db');
 const bodyParser = require('body-parser');
 const expenseRoutes = require('./routes/expenseRoutes');
+const authRoutes = require('./routes/authRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
+const Expense = require('./models/expenseModel');
+const User = require('./models/userModals');
 
-// middleware
+// Middleware
 const app = express();
 app.use(bodyParser.json());
+
+// Setting database associations
+Expense.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
+User.hasMany(Expense);
 
 // Test the database connection and sync models
 db.authenticate()
   .then(() => {
     console.log('Database connected...');
-    // Sync the database
     return db.sync();
   })
   .then(() => {
@@ -22,7 +29,9 @@ db.authenticate()
   });
 
 // Routes
+app.use('/auth', authRoutes);
 app.use('/expenses', expenseRoutes);
+app.use('/payment', paymentRoutes);
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {

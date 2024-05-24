@@ -1,0 +1,39 @@
+# Node modules
+node_modules/
+
+# Environment variables
+.env/
+
+# Log files
+logs/
+*.log
+
+# Dependency directories
+pids/
+.DS_Store
+.cache/
+dist/
+node_modules/
+bower_components/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Compiled binary addons (node-gyp)
+/build/
+
+# Optional npm cache directory
+.npm
+
+# Compiled Python files
+*.pyc
+
+# Mac files
+*.DS_Store
