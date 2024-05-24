@@ -35,6 +35,11 @@ app.use('/auth', authRoutes);
 app.use('/expenses', expenseRoutes);
 app.use('/payment', paymentRoutes);
 
+// Define route handler for the root URL ("/")
+app.get('/', (req, res) => {
+  res.send('Hello, welcome!');
+});
+
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
