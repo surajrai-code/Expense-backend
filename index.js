@@ -1,6 +1,7 @@
 const express = require('express');
 const db = require('./config/db');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const expenseRoutes = require('./routes/expenseRoutes');
 const authRoutes = require('./routes/authRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
@@ -10,6 +11,7 @@ const User = require('./models/userModals');
 // Middleware
 const app = express();
 app.use(bodyParser.json());
+app.use(cors());
 
 // Setting database associations
 Expense.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
