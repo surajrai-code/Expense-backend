@@ -1,5 +1,6 @@
-const {DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 const db = require('../config/db');
+const User = require('./userModals');
 
 const Expense = db.define('Expense', {
   name: {
@@ -24,6 +25,14 @@ const Expense = db.define('Expense', {
       isNumeric: true,
     }
   },
+  userId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: User,
+      key: 'id'
+    }
+  }
 }, {
   timestamps: true,
   indexes: [
@@ -32,5 +41,6 @@ const Expense = db.define('Expense', {
     }
   ]
 });
+
 
 module.exports = Expense;

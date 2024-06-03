@@ -2,6 +2,9 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModals');
 const { body, validationResult } = require('express-validator');
+const nodemailer = require('nodemailer');
+
+
 
 exports.signup = [
     body('username').notEmpty().withMessage('Username is required'),
@@ -47,10 +50,80 @@ exports.login = [
                 return res.status(400).json({ error: 'Invalid email or password' });
             }
 
-            const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+            const token = jwt.sign({ 
+                id: user.id, 
+                username: user.username, 
+                email: user.email, 
+                role: user.role 
+            }, process.env.JWT_SECRET);
             res.json({ token });
         } catch (error) {
             res.status(500).json({ error: 'Error logging in' });
         }
     }
 ];
+
+// POST request to generate password reset token
+exports.forgetPassword = async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        const user = await User.findOne({ where: { email } });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const resetUrl = `http://localhost:5173/reset-password/${token}`;
+
+        const transporter = nodemailer.createTransport({
+            host: 'smtp.gmail.com',
+            port: 587,
+            secure: false, 
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            }
+        });
+
+        await transporter.sendMail({
+            from: 'skrai9471930131@gmail.com',
+            to: user.email,
+            subject: 'Password Reset',
+            html: `Click <a href="${resetUrl}">here</a> to reset your password. This link is valid for 1 hour.`
+        });
+
+        res.json({ message: 'Password reset email sent' });
+    } catch (error) {
+        console.error('Error generating password reset token:', error);
+        res.status(500).json({ error: 'Error generating password reset token' });
+    }
+};
+
+exports.resetPassword = async (req, res) => {
+    const { token, password } = req.body;
+
+    try {
+        if (!token) {
+            return res.status(400).json({ error: 'Token is missing' });
+        }
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findByPk(decoded.userId);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        user.password = hashedPassword;
+        await user.save();
+
+        res.json({ message: 'Password reset successfully' });
+    } catch (error) {
+        console.error('Error resetting password:', error);
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(400).json({ error: 'Invalid token' });
+        }
+        res.status(500).json({ error: 'Error resetting password' });
+    }
+};

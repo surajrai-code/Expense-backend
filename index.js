@@ -13,9 +13,10 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-// Setting database associations
-Expense.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
-User.hasMany(Expense);
+
+// Establishing the association
+User.hasMany(Expense, { foreignKey: 'userId' });
+Expense.belongsTo(User, { foreignKey: 'userId' });
 
 // Test the database connection and sync models
 db.authenticate()

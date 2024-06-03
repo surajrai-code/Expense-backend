@@ -1,6 +1,11 @@
 const {DataTypes } = require('sequelize');
 const db = require('../config/db');
 const User = db.define('User', {
+  id:{
+    type:DataTypes.INTEGER,
+    primaryKey:true,
+    autoIncrement: true,
+  },
     username: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -19,5 +24,12 @@ const User = db.define('User', {
       type: DataTypes.ENUM('free', 'isPrimium'), 
       defaultValue: 'free' 
     }
+  },
+
+    {
+      tableName: 'User',
+      timestamps: false,
+  
   });
+  
   module.exports=User;

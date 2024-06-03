@@ -1,21 +1,28 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/userModals');
 
-module.exports = (req, res, next) => {
-    // Extract the token from the Authorization header
-    const authHeader = req.header('Authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ error: 'Access denied. Missing or invalid token.' });
+module.exports = async (req, res, next) => {
+  const authHeader = req.header('Authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Access denied. Missing token.' });
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Optionally, fetch the user from the database to ensure the user exists
+    const user = await User.findByPk(decoded.id);
+    if (!user) {
+      return res.status(401).json({ error: 'Access denied. User not found.' });
     }
 
-    const token = authHeader.split(' ')[1]; 
-
-    try {
-        // Verify the token using the JWT_SECRET
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded; 
-        next(); 
-    } catch (error) {
-        // If token verification fails, return a 401 Unauthorized response
-        return res.status(401).json({ error: 'Access denied. Invalid token.' });
-    }
+    // Attach the user object to the request for use in the next middleware/controller
+    req.user = user;
+    next();
+  } catch (error) {
+    console.error(error); 
+    return res.status(401).json({ error: 'Access denied. Invalid token.' });
+  }
 };
